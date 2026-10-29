@@ -50,6 +50,16 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
+      - name: Check test database variable
+        run: |
+          if [ -z "$TEST_MONGODB_URI" ]; then
+            echo "TEST_MONGODB_URI is EMPTY: check the repository secret name and location"
+            exit 1
+          fi
+          case "$TEST_MONGODB_URI" in
+            mongodb+srv://*|mongodb://*) echo "TEST_MONGODB_URI format looks valid" ;;
+            *) echo "TEST_MONGODB_URI has a wrong format: it must start with mongodb+srv://"; exit 1 ;;
+          esac
       - name: Install backend dependencies
         run: npm install
       - name: Run backend tests
